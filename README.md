@@ -23,7 +23,6 @@ This project uses **Python**  _(Python 3.9.7)_  To compare or check your version
   
 
 ##  MODULES
-
   
 
 ###  Files
@@ -31,7 +30,10 @@ This project uses **Python**  _(Python 3.9.7)_  To compare or check your version
 `selectFile()` - For selecting a file. This returns the path of the file.
 
 `saveFile()` - For saving the user's code to a specific directory.
-
   
+###  Lexical Analyzer
+
+`lexer(code)` - Accepts string as parameter. For converting the string to sequence of tokens. This returns the symbol table (2D list with dictionary as values) or a list containing error information.
+
 
 *<insert  other  modules\>*
