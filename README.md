@@ -29,7 +29,7 @@ This project uses **Python**  _(Python 3.9.7)_  To compare or check your version
 
 `selectFile()` - For selecting a file. This returns the path of the file.
 
-`saveFile(code)` - Accepts string as a parameter. For saving the user's code to a specific directory. This returns `True` if there were no problems while saving. It returns `False` if a problem occurred or if the file was not saved.
+`saveFile(code)` - Accepts string as a parameter. For saving the user's code to a specific directory. This returns the filename if there were no problems while saving. It returns `False` if a problem occurred or if the file was not saved.
   
 ###  Lexical Analyzer
 
