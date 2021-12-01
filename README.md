@@ -33,7 +33,7 @@ This project uses **Python**  _(Python 3.9.7)_  To compare or check your version
   
 ###  Lexical Analyzer
 
-`lexer(code)` - Accepts string as parameter. For converting the string to sequence of tokens. This returns the symbol table (2D list with dictionary as values) or a list containing error information.
+`lexer(code)` - Accepts string as parameter. For converting the string to sequence of tokens. This returns the symbol table which is a  2D list (a list of lists of dictionaries) or a list containing error information.
 
 
 *<insert  other  modules\>*
