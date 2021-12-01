@@ -1,7 +1,10 @@
 # User-defined modules
 import sys
 sys.path.append("./modules/analyzers/") 
+sys.path.append("./modules/files/") 
 from lexical_analyzer import lexer
+from saveFile import saveFile
+from selectFile import selectFile
 
 # Import statements for the GUI
 from pathlib import Path
@@ -11,6 +14,7 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./gui_assets")
 
 # Other Import statements
+import os
 from itertools import chain
 
 # For the GUI Assets
@@ -25,8 +29,6 @@ def displayLexemes(flatTokenList):
         lexeme_table.insert(parent="", index="end", iid=count, text="", values=(token["lexeme"], token["type"])) # insert current element to table
         count = count+1 # update count
 
-
-
 # execute Function
 def execute():
     code = text_editor.get("1.0","end-1c") # user's code
@@ -37,12 +39,29 @@ def execute():
     except:
         print("Something went wrong")
 
+# For saving the file (Save As)
+def save():
+    code = text_editor.get("1.0","end-1c") # user's code
+    print(saveFile(code)
+)
+
+# For selecting a file
+def openFile():
+    code = selectFile()
+    if code != "": # user selected a file
+        text_editor.delete("1.0",END)
+        window.title(os.path.basename(code)) # set the title to the filename of the opened file
+        f = open(code,"r")
+        text_editor.insert(END, f.read())
+        f.close()
+    else:
+        return
 
 ################### GUI ########################
 # INITIALIZATIONS
 window = Tk()
 window.geometry("1152x700") 
-window.title("SLR Code Interpreter")
+window.title("Unsaved File")
 window.resizable(False, False)
 style = ttk.Style()
 ################################################
@@ -272,7 +291,7 @@ saveBtn = Button(
     image=saveBtn_image,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("SAVE button clicked"),
+    command=save,
     relief="flat"
 )
 saveBtn.place(
@@ -288,7 +307,7 @@ openBtn = Button(
     image=openBtn_image,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("OPEN button clicked"),
+    command=openFile,
     relief="flat"
 )
 openBtn.place(
