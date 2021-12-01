@@ -11,6 +11,6 @@ def saveFile(code):
         f = open(fname, "w") # opens the file
         f.write(code) # writes the code to the file
         f.close() # closes the file
-        return True
+        return fname
     except:
         return False

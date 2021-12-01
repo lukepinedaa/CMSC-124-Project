@@ -42,8 +42,11 @@ def execute():
 # For saving the file (Save As)
 def save():
     code = text_editor.get("1.0","end-1c") # user's code
-    print(saveFile(code)
-)
+    try:
+        fname = saveFile(code)
+        window.title(os.path.basename(fname)) # set the title to the filename of the saved file
+    except:
+        return
 
 # For selecting a file
 def openFile():
