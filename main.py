@@ -153,8 +153,8 @@ style.configure(
     )
 style.map(
     "Treeview",
-     background = [("selected", "#24C347")],
-     foreground = [("!selected", "#24C347")]
+     background = [("selected", "#009687")],
+     foreground = [("!selected", "#009687")]
 )
 
 # pack 
@@ -207,8 +207,8 @@ style.configure(
     )
 style.map(
     "Treeview",
-     background = [("selected", "#24C347")],
-     foreground = [("!selected", "#24C347")]
+     background = [("selected", "#009687")],
+     foreground = [("!selected", "#009687")]
 )
 
 # pack 
@@ -237,7 +237,7 @@ canvas.create_text(
     559.0,
     anchor="nw",
     text="Console",
-    fill="#24C347",
+    fill="#009687",
     font=("Archivo Bold", 12 * -1)
 )
 ################################################
