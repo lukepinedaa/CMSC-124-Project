@@ -13,7 +13,7 @@ def lexer(code):
     #list that will serve as the symbol table
     symbolTable = []
 
-    obtw = False        #obtw comment flag
+    obtw = False #obtw comment flag
 
     #split code with new line as delimiter
     lines = code.splitlines()
@@ -47,9 +47,9 @@ def lexer(code):
             if skip > 0: 
                 skip -= 1
                 continue
-            
+
             #ignore comments, return errors if found
-            if (words[i] == "BTW") or (words[i] == "OBTW") or (words[i] == "TLDR") or (obtw == True):
+            if (words[i] == "BTW") or (words[i] == "OBTW") or (words[i] == "TLDR"):
                 #if current word is OBTW
                 if words[i] == "OBTW":
                     #if "OBTW" is start of the line, update obtw value
@@ -57,6 +57,7 @@ def lexer(code):
                         obtw = True
                     #if not, return error to main
                     else: return([False, lineCounter+1, "expected end of expression at: OBTW"])
+
                 #if current word is TLDR
                 elif words[i] == "TLDR":
                     #if no OBTW (not closed) before this TLDR, return error
@@ -66,6 +67,13 @@ def lexer(code):
                         obtw = False
                     #if not, return error to main
                     else: return(False, lineCounter+1, "multiple line comment may not appear on the same line as code")
+                
+                #append token to currentLine, current word as lexeme and type is "Comment Delimiter"
+                currentLine.append({"lexeme": words[i], "type": "Comment Delimiter"})
+                break #to continue to the next line
+            
+            #skip this line, part of OBTW comment
+            elif (obtw == True):
                 break
 
             #for flagged words wth unique first word as keyword
@@ -112,5 +120,5 @@ def lexer(code):
             #lexeme was not matched to any regex patterns, return error
             if withMatch == False:
                 return([False, lineCounter+1, "unknown token at: " + lexeme])
-        symbolTable.append(currentLine) #append currentLine if not empty list
+        symbolTable.append(currentLine) #append currentLine to symbolTable
     return symbolTable if obtw==False else [False, 1, "Segmentation Fault"] #return lexemeList if there is no OBTW comment or was closed by a "TLDR", else return error
