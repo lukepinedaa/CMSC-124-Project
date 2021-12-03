@@ -3,7 +3,7 @@ import re
 #Converts string to sequence of tokens
 def lexer(code):
     #keywords of more than one word (unique first word)
-    flaggedWords = {"I": ["HAS", "A"], "SUM": ["OF"], "DIFF": ["OF"], "PRODUCT": ["OF"], "QUOSHUNT": ["OF"], "MOD": ["OF"], "BIGGR": ["OF"], "SMALLR": ["OF"], "EITHER": ["OF"], "WON": ["OF"], "ANY": ["OF"], "ALL": ["OF"], "IS": ["NOW", "A"], "O": ["RLY?"], "YA": ["RLY"], "NO": ["WAI"]}
+    flaggedWords = {"I": ["HAS", "A"], "SUM": ["OF"], "DIFF": ["OF"], "PRODUKT": ["OF"], "QUOSHUNT": ["OF"], "MOD": ["OF"], "BIGGR": ["OF"], "SMALLR": ["OF"], "EITHER": ["OF"], "WON": ["OF"], "ANY": ["OF"], "ALL": ["OF"], "IS": ["NOW", "A"], "O": ["RLY?"], "YA": ["RLY"], "NO": ["WAI"]}
     #keywords of more than one word (nonunique first word)
     flaggedWords2 = {"BOTH": [["OF"], ["SAEM"]], "IM": [["IN", "YR"], ["OUTTA", "YR"]]}
 
@@ -22,8 +22,8 @@ def lexer(code):
     for lineCounter in range (len(lines)):
 
         #keep the delimiter when using re.split() : https://stackoverflow.com/questions/2136556/in-python-how-do-i-split-a-string-and-keep-the-separators
-        #split line by double quotes as delimiter but keep delimiter
-        tempList = re.split(r'(["].*["])', lines[lineCounter])
+        #split line with string literal regex as delimiter
+        tempList = re.split(r'(["][^"]*["])', lines[lineCounter])
         
         #list that will hold the "words" in current line
         words = []
