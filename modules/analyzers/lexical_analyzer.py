@@ -29,7 +29,7 @@ def lexer(code):
         words = []
         for i in range (0, len(tempList)):
             #current element is a string literal, append to words as it is
-            if re.match(r'["].*["]', tempList[i]):
+            if re.match(r'["][^"]*["]', tempList[i]):
                 words.append(tempList[i])
             #concatenate words and string split result
             else:
