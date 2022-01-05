@@ -35,5 +35,7 @@ This project uses **Python**  _(Python 3.9.7)_  To compare or check your version
 
 `lexer(code)` - Accepts string as parameter. For converting the string to sequence of tokens. This returns the symbol table which is a  2D list (a list of lists of dictionaries) or a list containing error information: `[False, lineNumber, ErrorMessage]`.
 
+### Syntax Analyzer
 
+`parser(output)` - Accepts the symbol table made using the Lexical Analyzer. For checking the grammar of the code using the tokens made by the Lexical Analyzer. This returns the line number of error, a short description of the error, and a symbol table which is a dictionary.
 *<insert  other  modules\>*
