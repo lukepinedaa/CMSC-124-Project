@@ -5,7 +5,6 @@ code = "" # global variable that will hold the code to be interpreted
 isDeclaring = False
 isMultipleLineRequired = False
 isPrinting = False
-printMe = ""
 currInput = "" # input of user from pop-up menu
 inputWindowIsClosed = True
 
@@ -78,9 +77,19 @@ def checkInLine(line, lexeme):
 
 # interprets the code
 def interpret(lexer_result,terminal,root):
-    global code, isDeclaring, var_iden, var_val
+    global code, isDeclaring, var_iden, var_val, symbol_table, isMultipleLineRequired, currInput
+
+    # reset global entities
+    code = "" # global variable that will hold the code to be interpreted
+    isDeclaring = False
+    isMultipleLineRequired = False
+    isPrinting = False
+    currInput = "" # input of user from pop-up menu
+    symbol_table = {"IT": "None"}
+    
     isDeclaring = isInputting = isPrinting = False
     toBePrinted = ""
+
     line_counter = 0 # line counter
     for line in lexer_result:
         line_counter += 1
@@ -184,4 +193,4 @@ def interpret(lexer_result,terminal,root):
         code = code + "\n"
         isDeclaring = isPrinting = isInputting = False
     # print(code)
-    execute()      
+    execute()   
