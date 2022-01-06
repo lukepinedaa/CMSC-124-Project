@@ -1,565 +1,151 @@
+import re
+
 def parser(output):
-	line_check_count = 0
-	symbol_table = {}
-	output_copy = output.copy()
-	error = ""
-	line = 0
+	code_copy = output.copy()
+	newArr = []
+	newArr1 = []
 	line_error = 0
+	lineCheckCount = 0
+	linecount = 0
+	for lines in code_copy:
+		for elements in lines:
+			if elements.get("type") == "Comment Delimiter":
+				lines.remove(elements)
+	while [] in code_copy:
+		code_copy.remove([])
 	for lines in output:
+		line = ""
 		for elements in lines:
-			if elements.get("type") == "Comment Delimiter":
-				lines.remove(elements)
-	while [] in output:
-		output.remove([])
+			if line == "":
+				line = elements.get("lexeme")
+			else:
+				line += " " + elements.get("lexeme")
+		newArr1.append(line)
+	for lines in code_copy:
+		line = ""
+		for elements in lines:
+			if line == "":
+				line = elements.get("lexeme")
+			else:
+				line += " " + elements.get("lexeme")
+		newArr.append(line)
+	linecount = len(newArr)
 
-	for lines in output_copy:
-		for elements in lines:
-			if elements.get("type") == "Comment Delimiter":
-				lines.remove(elements)
-	linecount = len(output)
-	linecount1 = len(output_copy)
-	if output[0][0].get("lexeme") == "HAI" :
-		line_check_count +=1 
+
+
+	# VISIBLE varident, VISIBLE no troof literal, GIMMEH varident, I HAS A varident, I HAS A varident ITZ literal, I HAS A varident ITZ varident, varident R varident, 
+
+	#VISIBLE regexs
+	#VISIBLE varident and VISIBLE no troof literal
+	VISIBLE1 = "^VISIBLE([^\S\r\n](-?(\d*\.\d+)|-?\d+|\".*\"|[a-zA-Z]\w*))+$"
+	#VISIBLE non_bool_expr - <math_expr> | <concatenate_yarn> | maek <type_casting_operand> a type |  maek <type_casting_operand> type
+	#<math_expr>
+	VISIBLE2 = "^VISIBLE[^\S\r\n](SUM[^\S\r\n]OF|DIFF[^\S\r\n]OF|PRODUKT[^\S\r\n]OF|QUOSHUNT[^\S\r\n]OF|MOD[^\S\r\n]OF|BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#comparisonexpr
+	VISIBLE3 = "^VISIBLE[^\S\r\n](BOTH[^\S\r\n]SAEM|DIFFRINT)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]((BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n])?([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#GIMMEH regexs
+	#GIMMEH varident
+	GIMMEH1 = "^GIMMEH[^\S\r\n][a-zA-Z]\w*$"
+	#variable declaration regexs
+	#I HAS A varident
+	IHASA1 = "^(I[^\S\r\n]HAS[^\S\r\n]A)[^\S\r\n][a-zA-Z]\w*$"
+	#I HAS A varident ITZ literal | I HAS A varident ITZ varident
+	IHASA2 = "^(I[^\S\r\n]HAS[^\S\r\n]A)[^\S\r\n][a-zA-Z]\w*[^\S\r\n]ITZ[^\S\r\n](-?(\d*\.\d+)|-?\d+|\".*\"|[a-zA-Z]\w*|(WIN|FAIL))$"
+	#I HAS A varident ITZ expr
+	#<math_expr>
+	IHASA3 = "^(I[^\S\r\n]HAS[^\S\r\n]A)[^\S\r\n][a-zA-Z]\w*[^\S\r\n]ITZ[^\S\r\n](SUM[^\S\r\n]OF|DIFF[^\S\r\n]OF|PRODUKT[^\S\r\n]OF|QUOSHUNT[^\S\r\n]OF|MOD[^\S\r\n]OF|BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#comparison expr
+	IHASA4 = "^(I[^\S\r\n]HAS[^\S\r\n]A)[^\S\r\n][a-zA-Z]\w*[^\S\r\n]ITZ[^\S\r\n](BOTH[^\S\r\n]SAEM|DIFFRINT)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]((BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n])?([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#<bool_expr>
+	#assignment regexs
+	#varident R literal | varident R varident
+	assign1 = "^[a-zA-Z]\w*[^\S\r\n]R[^\S\r\n](-?(\d*\.\d+)|-?\d+|\".*\"|[a-zA-Z]\w*|(WIN|FAIL))$"
+	#varident R expr - <math_expr> | <comparison_expr> | <bool_expr> | <bool_expr_infinite> | <concatenate_yarn> | <type_casting>
+	#varident R math_expr
+	assign2 = "^[a-zA-Z]\w*[^\S\r\n]R[^\S\r\n](SUM[^\S\r\n]OF|DIFF[^\S\r\n]OF|PRODUKT[^\S\r\n]OF|QUOSHUNT[^\S\r\n]OF|MOD[^\S\r\n]OF|BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#bool_expr
+	assign3 = "^[a-zA-Z]\w*[^\S\r\n]R[^\S\r\n](BOTH[^\S\r\n]OF|EITHER[^\S\r\n]OF|WON[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	assign4 = "^[a-zA-Z]\w*[^\S\r\n]R[^\S\r\n]NOT[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#comparison expr
+	assign5 = "^[a-zA-Z]\w*[^\S\r\n]R[^\S\r\n](BOTH[^\S\r\n]SAEM|DIFFRINT)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]((BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n])?([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#boolinf
+	assign6 = "^[a-zA-Z]\w*[^\S\r\n]R[^\S\r\n](ALL[^\S\r\n]OF|ANY[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))([^\S\r\n]AN[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL)))*$"
+	#typecast
+	assign7 = "^[a-zA-Z]\w*[^\S\r\n]R[^\S\r\n]MAEK[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n](A[^\S\r\n])?(TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE)$"
+
+	#math_expr (no nested functionality)
+	math_expr = "^(SUM[^\S\r\n]OF|DIFF[^\S\r\n]OF|PRODUKT[^\S\r\n]OF|QUOSHUNT[^\S\r\n]OF|MOD[^\S\r\n]OF|BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"	
+	#bool_expr (no nested functionality)
+	bool_expr1 = "^(BOTH[^\S\r\n]OF|EITHER[^\S\r\n]OF|WON[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	bool_expr2 = "^NOT[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#comparison_expr (no nested functionality)
+	comp_expr1 = "^(BOTH[^\S\r\n]SAEM|DIFFRINT)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]((BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n])?([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	#boolinfexpr
+	bool_inf_expr1 =  "^(ALL[^\S\r\n]OF|ANY[^\S\r\n]OF)[^\S\r\n]((BOTH[^\S\r\n]SAEM|DIFFRINT)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]((BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n])?([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))|[a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))([^\S\r\n]AN[^\S\r\n]((BOTH[^\S\r\n]SAEM|DIFFRINT)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]((BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n])?([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))|[a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL)))*$"
+	#typcast
+	typecast1 = "^MAEK[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n](A[^\S\r\n])?(TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE)$"
+	typecast2 = "^[a-zA-Z]\w*[^\S\r\n]IS[^\S\r\n]NOW[^\S\r\n]A[^\S\r\n](TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE)$"
+	HAI = "^HAI ([0-9]*)(\.([0-9]+))?$"
+	KTHXBYE = "^KTHXBYE$"
+	O_RLY = "^O[^\S\r\n]RLY\?$"
+	YA_RLY = "^YA[^\S\r\n]RLY$"
+	WTF = "^WTF\?$"
+	OMG_literal = "^OMG[^\S\r\n](-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	GTFO = "^GTFO$"
+	OMGWTF = "^OMGWTF$"
+	OIC = "^OIC$"
+	NO_WAI = "^NO[^\S\r\n]WAI$"
+	regexpatterns = [VISIBLE1, VISIBLE2,VISIBLE3, GIMMEH1, IHASA1, IHASA2, IHASA3, IHASA4, assign1,assign2,assign3,assign4,assign5,assign6,assign7, math_expr, bool_expr1, bool_expr2, comp_expr1, bool_inf_expr1, typecast1, typecast2, O_RLY, WTF, OMG_literal, GTFO, OMGWTF, OIC, YA_RLY,NO_WAI]
+	
+
+
+	if re.match(HAI, newArr[0]):
+		lineCheckCount +=1
 	else:
-		line = 0
-		for elements in range(linecount1):
-			if output[line] == output_copy[elements]:
-				line_error = elements + 1
-		error = "Syntax Error: Code Delimiter Missing"
-		print("Line:", line_error, error)
-		return(line_error,error, symbol_table)
-
-	if output[linecount-1][0].get("lexeme") == "KTHXBYE":
+		error = "HAI missing"
+		for lines in range(len(output)):
+			if newArr[0] == newArr1[lines]:
+				line_error = lines+1
+				break
+		print("Line:",line_error, "\n",error)
+		return(line_error, error)
+	if re.match(KTHXBYE, newArr[-1]):
 		pass
 	else:
-		line = linecount -1
-		for elements in range(linecount1):
-			print(output[line], output_copy[elements])
-			if output[line] == output_copy[elements]:
-				line_error = elements+1
-		error = "Syntax Error: Code Delimiter Missing"
-		print("Line:", line_error, error)
-		return(line_error,error, symbol_table)
-	startloop = 0
-	loopident = ""
-	while line_check_count < linecount-1 and line_check_count != 0:
+		error = "KTHXBYE missing"
+		for lines in range(len(output)):
+			if newArr[-1] == newArr1[lines]:
+				line_error = lines+1
+				break
+		print("Line:",line_error, "\n",error)
+		return(line_error, error)
 
-		isVarDec = 0
-		varID = ""
-		has_itz = 0
-		error = ""
-		is_operator = 0
-		isLiteral = 0
-		isVarID = 0
-		literal_type = ""
-		isPrint = 0
-		hasR = 0
-		expression = ""
-		hasAn = 0
-		operator_count = 0
-		an_count = 0
-		isRecast = 0
-		gimmeh = 0
-		math_expr = 0
-		bool_expr = 0
-		bool_expr_inf = 0
-		cnt = 0
-		notcnt = 0
-		not_count =0
-		cmpr_expr = 0
-		indec = ""
-		connector = 0
-		loop = 0
-		endloop = 0
-		concat = 0
-		typecast = 0
-		once = 0
-		for lexemes in range(len(output[line_check_count])):
-			# checks if the current lexeme is a vardec
-			# lines 33 - 46 - i has a varident
-			
-			if output[line_check_count][lexemes].get("type") == "Line Delimiter":
-				continue
+	while lineCheckCount < linecount-1 and lineCheckCount != 0:
+		noerror = False
+		curr_line = newArr[lineCheckCount]
+		for regex in regexpatterns:
 
-			elif output[line_check_count][lexemes].get("type") == "Variable Declaration" and isVarDec == 0:
-				isVarDec = 1
-				continue
-			#if the previous lexeme is a vardec, the current lexeme is the key (variable)
-			elif isVarDec == 1 and isVarID == 0 and output[line_check_count][lexemes].get("type") == "Variable Identifier":
-				varID = output[line_check_count][lexemes].get("lexeme")
-				
-				isVarID = 1
-				#if the current lexeme is the last on a line, set value to NOOB and saves the key and value to the symbol table
-				if lexemes == len(output[line_check_count])-1:
-					key = varID
-					value = "NOOB"
-					symbol_table[key] = value
-					isVarDec = 0
-				continue
-			#if the previous lexeme is varid, checks if the current lexeme is the ITZ keyword 
-			# lines 33 - 77 - i has a varident itz <literal>
-			elif isVarID == 1 and has_itz ==0 and output[line_check_count][lexemes].get("type") == "Variable Assignment":
-				has_itz = 1
-				continue
-			#if the lexeme after the ITZ keyword is a literal, saves the key and value to the symbol table
-			elif has_itz == 1 and is_operator == 0  and lexemes == len(output[line_check_count])-1 and (output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
-
-				literal_type = output[line_check_count][lexemes].get("type")
-				if literal_type == "Float Literal":
-					key = varID
-					value = float(output[line_check_count][lexemes].get("lexeme"))
-					symbol_table[key] = value
-				elif literal_type == "Integer Literal":
-					key = varID
-					value = int(output[line_check_count][lexemes].get("lexeme"))
-					symbol_table[key] = value
-				elif literal_type == "String Literal":
-					key = varID
-					value = output[line_check_count][lexemes].get("lexeme")
-					symbol_table[key] = value[1:-1]
-				else:
-				 	key = varID
-				 	value = output[line_check_count][lexemes].get("lexeme")
-				 	symbol_table[key] = value
-				continue
-			#if the lexeme after the ITZ keyword is an arithmetic operator, saves the operator and the whole expression in one variable
-			#lines 33 - n - i has varident itz <expr>/ varident R <varident> / varident R <literal> / varident R <expr> / visible varident | visible <non_bool_expr> | visible <no_troof_literal>
-			#lines 81 - 120 <math_expr>
-			elif is_operator == 0 and (output[line_check_count][lexemes].get("type") == "Addition Operator" or output[line_check_count][lexemes].get("type") == "Subtraction Operator" or output[line_check_count][lexemes].get("type") == "Product Operator" or output[line_check_count][lexemes].get("type") == "Quotient Operator" or output[line_check_count][lexemes].get("type") == "Modulo Operator" or output[line_check_count][lexemes].get("type") == "Max Operator" or output[line_check_count][lexemes].get("type") == "Min Operator" ):
-				math_expr = 1
-				operator_count +=1
-				operator = output[line_check_count][lexemes].get("type")
-				is_operator = 1
-				if expression == "":
-					expression = output[line_check_count][lexemes].get("lexeme")
-				else:
-					expression += " " + output[line_check_count][lexemes].get("lexeme")
-				continue
-			elif (is_operator == 1 or hasAn == 1) and (math_expr == 1 or bool_expr_inf == 1 or cmpr_expr == 1) and (output[line_check_count][lexemes].get("type") == "Addition Operator" or output[line_check_count][lexemes].get("type") == "Subtraction Operator" or output[line_check_count][lexemes].get("type") == "Product Operator" or output[line_check_count][lexemes].get("type") == "Quotient Operator" or output[line_check_count][lexemes].get("type") == "Modulo Operator" or output[line_check_count][lexemes].get("type") == "Max Operator" or output[line_check_count][lexemes].get("type") == "Min Operator" ):
-				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
-				operator_count +=1
-				cnt += 1	
-				if hasAn == 1:
-					hasAn = 0
-				continue	
-			elif is_operator == 1 and hasAn == 0 and (math_expr == 1 or bool_expr_inf == 1 or cmpr_expr == 1) and (output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or  output[line_check_count][lexemes].get("type") == "Variable Identifier" or  output[line_check_count][lexemes].get("type") == "String Literal"):
-				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
-				cnt += 1
-				if operator == "Not Operator":
-					not_count +=1
-				if operator == "Not Operator" and lexemes == len(output[line_check_count])-1:
-					if (has_itz == 1 or hasR == 1):	
-						if notcnt == not_count:
-							key = varID
-							value = expression
-							symbol_table[key] = value
-							continue
-						else:
-							for elements in range(linecount1-1):
-								if output[line_check_count] == output_copy[elements]:
-									line_error = elements+1
-							error = "Syntax Error: Invalid Expression"
-							print("Line:", line_error, error)
-							return(line_error,error, symbol_table)
-					if isPrint == 1:
-						if notcnt == not_count: 
-							continue
-						else:
-							for elements in range(linecount1-1):
-								if output[line_check_count] == output_copy[elements]:
-									line_error = elements+1
-							error = "Syntax Error: Invalid Expression"
-							print("Line:", line_error, error)
-							return(line_error,error, symbol_table)
-				continue
-			elif is_operator == 1 and (output[line_check_count][lexemes].get("type") == "Operand Separator"):
-				an_count += 1
-				hasAn = 1
-				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
-				if lexemes == len(output[line_check_count])-1:
-					for elements in range(linecount1-1):
-						if output[line_check_count] == output_copy[elements]:
-							line_error = elements+1
-					error = "Syntax Error: Invalid Expression"
-					print("Line:", line_error, error)
-					return(line_error,error, symbol_table)
-				continue
-			elif hasAn == 1 and (math_expr == 1 or bool_expr_inf == 1 or cmpr_expr == 1) and (output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or  output[line_check_count][lexemes].get("type") == "Variable Identifier" or  output[line_check_count][lexemes].get("type") == "String Literal"):
-				
-				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
-				hasAn = 0
-				cnt += 1
-				if (has_itz == 1 or hasR == 1):
-					if math_expr ==1 or cmpr_expr == 1:	
-						if lexemes == len(output[line_check_count])-1:
-
-							if operator_count == an_count:
-								key = varID
-								value = expression
-								symbol_table[key] = value
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-					elif bool_expr_inf == 1:
-						if lexemes == len(output[line_check_count])-1 or output[line_check_count][lexemes+1].get("type") == "Line Delimiter":
-							if an_count == cnt-1:
-								key = varID
-								value = expression
-								symbol_table[key] = value
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-				
-				if isPrint == 1:
-					if math_expr == 1 or cmpr_expr == 1:
-						if lexemes == len(output[line_check_count])-1 :
-							if operator_count == an_count:
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-					elif bool_expr_inf == 1:
-						if lexemes == len(output[line_check_count])-1 or output[line_check_count][lexemes+1].get("type") == "Line Delimiter":
-							if an_count == cnt-1:
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-				continue
-			#lines 122 - 162 <bool_expr>
-			elif (output[line_check_count][lexemes].get("type") == "And Operator" or output[line_check_count][lexemes].get("type") == "Or Operator" or output[line_check_count][lexemes].get("type") == "XOR Operator" or output[line_check_count][lexemes].get("type") == "Not Operator"):
-				bool_expr = 1
-				operator = output[line_check_count][lexemes].get("type")
-				operator_count +=1
-				is_operator = 1
-				if expression == "":
-					expression = output[line_check_count][lexemes].get("lexeme")
-				else:
-					expression += " " + output[line_check_count][lexemes].get("lexeme")
-				if operator == "Not Operator":
-					notcnt +=1
-				continue
-			elif (is_operator == 1 or hasAn == 1) and (bool_expr == 1 or bool_expr_inf == 1 or cmpr_expr == 1) and (output[line_check_count][lexemes].get("type") == "And Operator" or output[line_check_count][lexemes].get("type") == "Or Operator" or output[line_check_count][lexemes].get("type") == "XOR Operator" or output[line_check_count][lexemes].get("type") == "Not Operator"):
-				
-				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
-				operator = output[line_check_count][lexemes].get("type")
-				operator_count +=1
-				cnt += 1
-			
-				if hasAn == 1:
-					hasAn = 0
-				if operator == "Not Operator":
-					hasAn = 0
-					notcnt += 1
-				continue	
-			elif is_operator == 1 and hasAn == 0 and (bool_expr == 1 or bool_expr_inf == 1 or cmpr_expr == 1) and (output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or  output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
-				
-				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
-				cnt += 1
-				if operator == "Not Operator":
-					not_count +=1
-				if operator == "Not Operator" and lexemes == len(output[line_check_count])-1:
-					if (has_itz == 1 or hasR == 1):	
-						if notcnt == not_count:
-							key = varID
-							value = expression
-							symbol_table[key] = value
-							continue
-						else:
-							for elements in range(linecount1-1):
-								if output[line_check_count] == output_copy[elements]:
-									line_error = elements+1
-							error = "Syntax Error: Invalid Expression"
-							print("Line:", line_error, error)
-							return(line_error,error, symbol_table)
-					if isPrint == 1:
-						if notcnt == not_count: 
-							continue
-						else:
-							for elements in range(linecount1-1):
-								if output[line_check_count] == output_copy[elements]:
-									line_error = elements+1
-							error = "Syntax Error: Invalid Expression"
-							print("Line:", line_error, error)
-							return(line_error,error, symbol_table)
-				continue 
-			elif hasAn == 1 and (bool_expr == 1 or bool_expr_inf == 1 or cmpr_expr == 1) and (output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or  output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
-				
-				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
-				hasAn = 0
-				cnt += 1
-				if (has_itz == 1 or hasR == 1):
-					if bool_expr ==1 or cmpr_expr == 1:	
-						if lexemes == len(output[line_check_count])-1:
-
-							if operator_count == an_count:
-								key = varID
-								value = expression
-								symbol_table[key] = value
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-					elif bool_expr_inf == 1:
-						if lexemes == len(output[line_check_count])-1 or output[line_check_count][lexemes+1].get("type") == "Line Delimiter":
-							if an_count == cnt-1:
-								key = varID
-								value = expression
-								symbol_table[key] = value
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-				
-				if isPrint == 1:
-					if bool_expr == 1 or cmpr_expr == 1:
-						if lexemes == len(output[line_check_count])-1:
-							if operator_count == an_count: 
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-					elif bool_expr_inf == 1:
-						if lexemes == len(output[line_check_count])-1 or output[line_check_count][lexemes+1].get("type") == "Line Delimiter":
-							if an_count == cnt-1:
-								continue
-							else:
-								for elements in range(linecount1-1):
-									if output[line_check_count] == output_copy[elements]:
-										line_error = elements+1
-								error = "Syntax Error: Invalid Expression"
-								print("Line:", line_error, error)
-								return(line_error,error, symbol_table)
-				continue
-			#lines 164 - n <bool_expr_infinite>
-			elif (output[line_check_count][lexemes].get("type") == "Infinite Arity Or Operator" or output[line_check_count][lexemes].get("type") == "Infinite Arity And Operator"):
-				bool_expr_inf = 1
-				operator_count +=1
-				is_operator = 1
-				operator = output[line_check_count][lexemes].get("type")
-				if expression == "":
-					expression = output[line_check_count][lexemes].get("lexeme")
-				else:
-					expression += " " + output[line_check_count][lexemes].get("lexeme")
-				continue
-			#line 350 - <comparison_expr>
-			elif (output[line_check_count][lexemes].get("type") == "Equality Operator" or output[line_check_count][lexemes].get("type") == "Inequality Operator"):
-				cmpr_expr = 1
-				is_operator = 1
-				operator_count +=1
-				operator = output[line_check_count][lexemes].get("type")
-				if expression == "":
-					expression = output[line_check_count][lexemes].get("lexeme")
-				else:
-					expression += " " + output[line_check_count][lexemes].get("lexeme")
-				continue
-
-			#checks if the lexeme is the VISIBLE keyword, sets isPrint to 1
-			elif output[line_check_count][lexemes].get("type") == "Output Keyword":
-				isPrint = 1
-				continue
-			#if the previous lexeme is the VISIBLE keyword, print the current lexeme
-			
-			elif isPrint == 1 and output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "String Literal":
-				
-				continue
-			elif isVarID == 0 and output[line_check_count][lexemes].get("type") == "Variable Identifier" and hasR == 0 and startloop == 0 and is_operator == 0 and typecast == 0:
-
-				varID = output[line_check_count][lexemes].get("lexeme")
-				isVarID = 1
-				continue
-			elif isVarID == 1 and hasR == 0 and output[line_check_count][lexemes].get("type") == "Assignment Keyword":
-				
-				hasR = 1
-				continue
-			elif hasR == 1 and expression == "" and (output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
-				
-				if output[line_check_count][lexemes].get("type") == "Variable Identifier":
-					symbol_table[varID] = output[line_check_count][lexemes].get("type") == "Variable Identifier"
-				elif output[line_check_count][lexemes].get("type") == "Float Literal":
-					symbol_table[varID] = float(output[line_check_count][lexemes].get("lexeme"))
-				elif output[line_check_count][lexemes].get("type") == "Integer Literal":
-					symbol_table[varID] = int(output[line_check_count][lexemes].get("lexeme"))
-				elif output[line_check_count][lexemes].get("type") == "String Literal":
-					symbol_table[varID] = output[line_check_count][lexemes].get("lexeme")
-				elif output[line_check_count][lexemes].get("type") == "Boolean Literal":
-					if output[line_check_count][lexemes].get("lexeme") == "WIN":
-						symbol_table[varID] = True
-					elif output[line_check_count][lexemes].get("lexeme") == "FAIL" :
-						symbol_table[varID] = False
-					else:
-						for elements in range(linecount1-1):
-							if output[line_check_count] == output_copy[elements]:
-								line_error = elements+1
-						error = "Syntax Error: Invalid Expression"
-						print("Line:", line_error, error)
-						return(line_error,error, symbol_table)
-						
-				else:
-					for elements in range(linecount1-1):
-						if output[line_check_count] == output_copy[elements]:
-							line_error = elements+1
-					error = "Syntax Error: Invalid Expression"
-					print("Line:", line_error, error)
-					return(line_error,error, symbol_table)
-					continue
-			elif output[line_check_count][lexemes].get("type") == "Input Keyword":
-				gimmeh = 1
-				continue
-			elif gimmeh == 1 and output[line_check_count][lexemes].get("type") == "Variable Identifier":
-				continue
-			elif isVarID == 1 and output[line_check_count][lexemes].get("type") == "Recast Operator":
-				isRecast = 1
-				continue
-			elif isRecast == 1 and output[line_check_count][lexemes].get("type") == "Type Literal":
-				continue
-			elif output[line_check_count][lexemes].get("type") == "Start Loop Keyword":
-
-				startloop = 1
-				continue
-			elif startloop == 1 and loopident == "" and output[line_check_count][lexemes].get("type") == "Variable Identifier":
-
-				loopident = output[line_check_count][lexemes].get("lexeme")
-				continue
-			elif startloop == 1 and loopident != ""  and (output[line_check_count][lexemes].get("type") == "Increment Keyword" or output[line_check_count][lexemes].get("type") == "Decrement Keyword"):
-				indec = output[line_check_count][lexemes].get("lexeme")
-				continue
-			elif startloop == 1 and loopident != "" and indec != "" and (output[line_check_count][lexemes].get("type") == "Connector Keyword"):
-				connector = 1
-				continue
-			elif startloop == 1 and loopident != "" and indec != "" and connector == 1 and (output[line_check_count][lexemes].get("type") == "Variable Identifier"):
-
-				isVarID = 1
-				continue
-			elif startloop == 1 and loopident != "" and indec != "" and connector == 1 and isVarID == 1 and output[line_check_count][lexemes].get("type") == "Loop Keyword":
-				loop = 1 
-				continue
-			elif startloop == 1 and lexemes == 0 and output[line_check_count][lexemes].get("type") == "End Loop Keyword":
-				endloop = 1
-				continue
-			elif endloop ==  1 and output[line_check_count][lexemes].get("lexeme") == loopident:
-				startloop = 0
-				loopident = ""
-				continue
-			elif output[line_check_count][lexemes].get("type") == "Concatenate Operator":
-				concat = 1
-				is_operator = 1
-				operator_count +=1
-				operator = output[line_check_count][lexemes].get("type")
-				if expression == "":
-					expression = output[line_check_count][lexemes].get("lexeme")
-				else:
-					expression += " " + output[line_check_count][lexemes].get("lexeme")
-				continue
-			elif concat == 1 and (output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or output[line_check_count][lexemes].get("type") == "String Literal" ):
-				expression += " " + output[line_check_count][lexemes].get("lexeme")
-				cnt +=1
-
-				if lexemes == len(output[line_check_count])-1 or output[line_check_count][lexemes+1].get("type") == "Line Delimiter":
-					if has_itz == 1 or hasR == 1:
-						if cnt == an_count+1:
-							key = varID
-							value = expression
-							symbol_table[key] =value
-							continue
-						else:
-							for elements in range(linecount1-1):
-								if output[line_check_count] == output_copy[elements]:
-									line_error = elements+1	
-							error = "Syntax Error"
-							print("Line:", line_error, error)
-							return(line_error,error, symbol_table)
-					elif isPrint == 1:
-						if cnt == an_count-1:
-							continue
-						else:
-							for elements in range(linecount1-1):
-								if output[line_check_count] == output_copy[elements]:
-									line_error = elements+1	
-							error = "Syntax Error"
-							print("Line:", line_error, error)
-							return(line_error,error, symbol_table)
-					else:
-						continue
-				continue
-			elif output[line_check_count][lexemes].get("type") == "Typecast Operator":
-				typecast=1
-				is_operator = 1
-				operator = output[line_check_count][lexemes].get("lexeme")
-				expression = output[line_check_count][lexemes].get("lexeme")
-
-				continue
-			elif typecast == 1 and is_operator == 1 and expression==operator and (output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
-				expression += " " + output[line_check_count][lexemes].get("lexeme")
-				if output[line_check_count][lexemes].get("type") == "Variable Identifier":
-					varID = output[line_check_count][lexemes].get("lexeme")
-				once += 1
-				continue
-			elif typecast == 1 and is_operator == 1 and expression != operator and output[line_check_count][lexemes].get("type") == "Separator":
-				
-				expression += " " + output[line_check_count][lexemes].get("lexeme")
-				continue
-			elif typecast == 1 and is_operator == 1 and expression != operator and output[line_check_count][lexemes].get("type") == "Type Literal":
-				expression += " " + output[line_check_count][lexemes].get("lexeme")
-				if lexemes == len(output[line_check_count])-1 and once == 1:
-					if hasR == 1:
-						key = varID
-						value = expression
-						symbol_table[key] = value
-						continue
-					elif isPrint == 1:
-						continue
-				else:
-					for elements in range(linecount1-1):
-						if output[line_check_count] == output_copy[elements]:
-							line_error = elements+1	
-					error = "Syntax Error"
-					print("Line:", line_error, error)
-					return(line_error,error, symbol_table)
-
-				continue
+			reg = regex 
+			if re.match(reg,curr_line):
+				noerror = True
+				break
+			elif regex == regexpatterns[-1]:
+				print(curr_line)
+				print("wala pa sa syntax")
 			else:
-				print(output[line_check_count][lexemes])
-				for elements in range(linecount1-1):
-					if output[line_check_count] == output_copy[elements]:
-						line_error = elements+1	
-				error = "Syntax Error"
-				print("Line:", line_error, error)
-				return(line_error,error, symbol_table)
+				continue
 
-		line_check_count+=1
+
+
+		if noerror == True:
+			lineCheckCount+=1
+			continue
+		else:
+			error = "Syntax Error"
+			for lines in range(len(output)):
+				if newArr[lineCheckCount] == newArr1[lines]:
+					line_error = lines+1
+					break
+			print("Line:",line_error, "\n",error)
+			return(line_error, error)
 		
-	print("SYMBOL TABLE")
-	for elements in symbol_table:
-		print(elements,":", symbol_table[elements])
-	return(line_error,error, symbol_table)
