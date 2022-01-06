@@ -5,10 +5,13 @@ sys.path.append("./modules/files/")
 from lexical_analyzer import lexer
 from saveFile import saveFile
 from selectFile import selectFile
+from syntax_analyzer import parser
+from semantic_analyzer import interpret
 
 # Import statements for the GUI
 from pathlib import Path
 from tkinter import *
+from tkinter import messagebox
 from tkinter import ttk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./gui_assets")
@@ -29,15 +32,40 @@ def displayLexemes(flatTokenList):
         lexeme_table.insert(parent="", index="end", iid=count, text="", values=(token["lexeme"], token["type"])) # insert current element to table
         count = count+1 # update count
 
+# For printing error on the console
+def printError(err):
+    if err[0] == "lexical_err":
+        print("lexical error")
+    elif err[0] == "parser_err":
+        print("parser error")
+
 # execute Function
 def execute():
     code = text_editor.get("1.0","end-1c") # user's code
-    lexer_result = lexer(code)
+
+    if code == "": # no code 
+        return
+
+    lexer_result = lexer(code) # result of lexer
     try:
         flatTokenList = list(chain.from_iterable(lexer_result)) # flattens the 2D list (reference: https://www.geeksforgeeks.org/python-ways-to-flatten-a-2d-list/)
-        displayLexemes( flatTokenList) # display the result on the table
-    except:
-        print("Something went wrong")
+        displayLexemes(flatTokenList) # display the result on the table
+
+        if lexer_result[0] != False: # no error from lexer
+            parser_result = parser(lexer_result) # pass lexer result to parser
+
+            if parser_result[0] != 0: # parser detected an error
+                printError(["parser_err",parser_result]) # print error message to console
+            else:
+                interpret(lexer_result,terminal) # invoke semantic analyzer
+                
+
+        else: # lexer detected an error
+            printError(["lexical_err",lexer_result]) # print error message to console
+
+    except Exception as e:
+        # print("Something went wrong")
+        print("\n=====================\n",e)
 
 # For saving the file (Save As)
 def save():
@@ -119,7 +147,7 @@ text_editor = Text(
     font=("Monaco", 12),
     width=170,
     height=35,
-    selectbackground="#25C348",
+    selectbackground="#009687",
     selectforeground="black",
     foreground="white",
     undo=True,
@@ -138,6 +166,33 @@ textEditorFrame.place(
     width=900.0,
     height=492.0
 )
+
+################################################
+# TERMINAL
+terminal_image = PhotoImage(
+    file=relative_to_assets("entry_2.png"))
+terminal_bg_2 = canvas.create_image(
+    576.0,
+    638.0,
+    image=terminal_image
+)
+terminal = Text(
+    bd=0,
+    bg="#1E292F",
+    highlightthickness=0,
+    selectbackground="#009687",
+    selectforeground="black",
+    foreground="white",
+    state=DISABLED
+)
+terminal.place(
+    x=13.0,
+    y=576.0,
+    width=1125.0,
+    height=122.0
+)
+################################################
+
 ################################################
 # LEXEME TREEVIEW
 
@@ -262,28 +317,6 @@ canvas.create_text(
     fill="#009687",
     font=("Archivo Bold", 12 * -1)
 )
-################################################
-
-################################################
-# TERMINAL
-# terminal_image = PhotoImage(
-#     file=relative_to_assets("entry_2.png"))
-# terminal_bg_2 = canvas.create_image(
-#     576.0,
-#     638.0,
-#     image=terminal_image
-# )
-# terminal = Text(
-#     bd=0,
-#     bg="#1E292F",
-#     highlightthickness=0
-# )
-# terminal.place(
-#     x=0.0,
-#     y=576.0,
-#     width=1152.0,
-#     height=122.0
-# )
 ################################################
 
 ################################################
