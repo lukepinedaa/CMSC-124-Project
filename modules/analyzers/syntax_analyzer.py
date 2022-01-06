@@ -78,6 +78,7 @@ def parser(output):
 		for lexemes in range(len(output[line_check_count])):
 			# checks if the current lexeme is a vardec
 			# lines 33 - 46 - i has a varident
+
 			if output[line_check_count][lexemes].get("type") == "Line Delimiter":
 				continue
 
@@ -271,7 +272,8 @@ def parser(output):
 					notcnt += 1
 				continue	
 			elif is_operator == 1 and hasAn == 0 and (bool_expr == 1 or bool_expr_inf == 1 or cmpr_expr == 1) and (output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or  output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
-				
+				if (output[line_check_count][lexemes].get("lexeme") == "number"):
+					print("dito")
 				expression = expression + " " + output[line_check_count][lexemes].get("lexeme")
 				cnt += 1
 				if operator == "Not Operator":
@@ -393,7 +395,7 @@ def parser(output):
 			elif isPrint == 1 and output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "String Literal":
 				
 				continue
-			elif isVarID == 0 and output[line_check_count][lexemes].get("type") == "Variable Identifier" and hasR == 0 and startloop == 0 and is_operator == 0:
+			elif isVarID == 0 and output[line_check_count][lexemes].get("type") == "Variable Identifier" and hasR == 0 and startloop == 0 and is_operator == 0 and typecast == 0:
 				
 				varID = output[line_check_count][lexemes].get("lexeme")
 				isVarID = 1
@@ -401,7 +403,8 @@ def parser(output):
 			elif isVarID == 1 and hasR == 0 and output[line_check_count][lexemes].get("type") == "Assignment Keyword":
 				hasR = 1
 				continue
-			elif hasR == 1 and (output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
+			elif hasR == 1 and expression == "" and (output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
+				
 				if output[line_check_count][lexemes].get("type") == "Variable Identifier":
 					symbol_table[varID] = output[line_check_count][lexemes].get("type") == "Variable Identifier"
 				elif output[line_check_count][lexemes].get("type") == "Float Literal":
@@ -520,7 +523,6 @@ def parser(output):
 				continue
 			elif typecast == 1 and is_operator == 1 and expression==operator and (output[line_check_count][lexemes].get("type") == "Variable Identifier" or output[line_check_count][lexemes].get("type") == "Float Literal" or output[line_check_count][lexemes].get("type") == "Integer Literal" or output[line_check_count][lexemes].get("type") == "String Literal" or output[line_check_count][lexemes].get("type") == "Boolean Literal"):
 				
-
 				expression += " " + output[line_check_count][lexemes].get("lexeme")
 				if output[line_check_count][lexemes].get("type") == "Variable Identifier":
 					varID = output[line_check_count][lexemes].get("lexeme")
