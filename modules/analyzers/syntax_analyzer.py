@@ -18,24 +18,23 @@ def parser(output):
 				lines.remove(elements)
 	linecount = len(output)
 	linecount1 = len(output_copy)
-
-
-
 	if output[0][0].get("lexeme") == "HAI" :
-		line_check_count +=1
-		line =0 
+		line_check_count +=1 
 	else:
-
-		for elements in range(linecount1-1):
+		line = 0
+		for elements in range(linecount1):
 			if output[line] == output_copy[elements]:
 				line_error = elements + 1
 		error = "Syntax Error: Code Delimiter Missing"
 		print("Line:", line_error, error)
 		return(line_error,error, symbol_table)
+
 	if output[linecount-1][0].get("lexeme") == "KTHXBYE":
-		line = linecount - 1
+		pass
 	else:
-		for elements in range(linecount1-1):
+		line = linecount -1
+		for elements in range(linecount1):
+			print(output[line], output_copy[elements])
 			if output[line] == output_copy[elements]:
 				line_error = elements+1
 		error = "Syntax Error: Code Delimiter Missing"
@@ -564,4 +563,3 @@ def parser(output):
 	for elements in symbol_table:
 		print(elements,":", symbol_table[elements])
 	return(line_error,error, symbol_table)
-
