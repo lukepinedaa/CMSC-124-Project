@@ -2,10 +2,8 @@
 # Accepts the result of the lexer as a parameter
 from tkinter import *
 import math
-code = "" # global variable that will hold the code to be interpreted
-isDeclaring = False
+
 isMultipleLineRequired = False
-isPrinting = False
 currInput = "" # input of user from pop-up menu
 inputWindowIsClosed = True
 
@@ -14,18 +12,17 @@ symbol_table = {"IT": "None"} # symbol table (list of dictionaries)
 
 # for getting input of user (when GIMMEH is input)
 def inputBtnClick(i,lexeme,button_pressed):
-    global currInput, code
+    global currInput
     button_pressed.set(1)
     currInput = i
     symbol_table[lexeme] = currInput
-    code = code + lexeme + "=" + currInput
-    print(code)
 
 def on_menu_closing(button_pressed):
     global currInput
     button_pressed.set(1)
     currInput = ""
-    
+
+#gets the input from user
 def getInput(root,lexeme):
     global currInput
     menu = Toplevel(root)
@@ -54,14 +51,7 @@ def getInput(root,lexeme):
     
     go.wait_variable(button_pressed)
 
-    menu.destroy()    
-
-# executes the code 
-def execute():
-    global code, isDeclaring, isMultipleLineRequired
-    exec(code)
-    isDeclaring = False
-    isMultipleLineRequired = False
+    menu.destroy()
 
 # for printing to console
 def printToConsole(s,terminal):
@@ -70,30 +60,12 @@ def printToConsole(s,terminal):
     terminal.insert(END,s+"\n")
     terminal.config(state=DISABLED)
 
+#checks if elexeme is in current line
 def checkInLine(line, lexeme):
     for token in line:
         if token["lexeme"] == lexeme:
             return True
     return False
-
-def evaluate(expr):
-    # base case
-    if len(expr) == 1:
-        return str(eval(expr[0]))
-    
-    # recursive calls
-    else:
-        if expr[0] == "SUM OF":
-            #SUM OF SUM OF A AN B AN SUM OF 2 AN 3
-            if expr[1] in ("SUM OF", "DIFF OF", "PRODUKT OF", "QUOSHUNT OF", "MOD OF", "BIGGR OF", "SMALLR OF", "BOTH SAEM", "DIFFRINT", "BOTH OF", "EITHER OF"):
-                leftOp = []
-                rightOp = []
-                # loop here to separate left and right expression/operand
-                return evaluate(leftOp)+"+"+evaluate(rightOp)
-                
-            # SUM OF A AN DIFF OF C AN D => [A,DIFF OF C,D] => [A] [DIFF OF C,D]
-        pass
-    # I HAS A num ITZ SUM OF 1 AN 1 => "num =" + evaluate(["SUM OF", "1", "AN", "1"])
 
 # for truncating decimals (reference: https://stackoverflow.com/questions/29246455/python-setting-decimal-place-range-without-rounding)
 def truncate(f, n):
@@ -109,19 +81,17 @@ def is_num(s):
 
 # interprets the code
 def interpret(lexer_result,terminal,root):
-    global code, isDeclaring, symbol_table, isMultipleLineRequired, currInput
+    global symbol_table, isMultipleLineRequired, currInput
     
     var_iden = ""
 
     # reset global entities
-    code = "" # global variable that will hold the code to be interpreted
-    isDeclaring = False
     isMultipleLineRequired = False
     isPrinting = False
     currInput = "" # input of user from pop-up menu
     symbol_table = {"IT": None}
 
-    isDeclaring = isInputting = isPrinting = False
+    isDeclaring = isInputting = isPrinting = isTypecasting = False
     toBePrinted = ""
 
     line_counter = 0 # line counter
@@ -184,7 +154,6 @@ def interpret(lexer_result,terminal,root):
                 elif isDeclaring == True:
                     #if will initialize value
                     if checkInLine(line, "ITZ"):
-                        code = code + token["lexeme"]
                         #current variable is the destination variable
                         if isDest == True:
                             #variable is not yet in symbol table, add to symbol table, set var_iden to curren varaiable, and update isDest to False
@@ -209,7 +178,6 @@ def interpret(lexer_result,terminal,root):
                     #uninitialized variable, add to symbol table with None as value
                     else:
                         symbol_table[token["lexeme"]] = None
-                        code = code + token["lexeme"] + "=None"
                 
                 #current line is printing
                 elif isPrinting:
@@ -223,7 +191,6 @@ def interpret(lexer_result,terminal,root):
                             toBePrinted = toBePrinted + str(truncate(float(symbol_table[token["lexeme"]]), 2)) 
                         else:
                             toBePrinted = toBePrinted + str(symbol_table[token["lexeme"]])
-                    # code = code + token["lexeme"] + ")"
                     # printToConsole(symbol_table[token["lexeme"]],terminal)
 
                 #get input from user
@@ -286,8 +253,6 @@ def interpret(lexer_result,terminal,root):
                             symbol_table[var_iden] = True
                         else:
                             symbol_table[var_iden] = False
-                        
-                    code = code + token["lexeme"]
             
             #current lexeme is GIMMEH
             elif _type == "Input Keyword":
@@ -324,41 +289,50 @@ def interpret(lexer_result,terminal,root):
                          printToConsole("ERROR: Cannot typecast "+var_iden+" into NOOB at Line "+str(line_counter),terminal) # error
                     #typecast to corresponding float value
                     elif token["lexeme"] == "NUMBR":
+                        #initialized variable
                         if symbol_table[var_iden] != None:
                             if (type(symbol_table[var_iden]) == str) and is_num(symbol_table[var_iden]):
                                 symbol_table[dest] = float(symbol_table[var_iden].replace('"', ""))
+                            #cannot be converted to float, error occurred
                             elif is_num(symbol_table[var_iden]) == False:
                                 printToConsole("ERROR: Cannot typecast at Line "+str(line_counter),terminal)
                                 return symbol_table
                             else:
                                 symbol_table[dest] = float(symbol_table[var_iden])
+                        #uninitialized variable
                         else:
                             symbol_table[dest] = 0.00
                     #typecast to corresponding int value
                     elif token["lexeme"] == "NUMBAR":
+                        #initialized variable
                         if symbol_table[var_iden] != None:
                             if (type(symbol_table[var_iden]) == str) and is_num(symbol_table[var_iden]):
-                                symbol_table[dest] = int(symbol_table[var_iden].replace('"', ""))
+                                symbol_table[dest] = int(float(symbol_table[var_iden].replace('"', "")))
+                            #cannot be converted to int, error occurred
                             elif is_num(symbol_table[var_iden]) == False:
                                 printToConsole("ERROR: Cannot typecast at Line "+str(line_counter),terminal)
                                 return symbol_table
                             else:
                                 symbol_table[dest] = int(symbol_table[var_iden])
+                        #uninitialized variable
                         else:
                             symbol_table[dest] = 0
+                    #typecast to corresponding string value
                     elif token["lexeme"] == "YARN":
+                        #initialized variable
                         if symbol_table[var_iden] != None:
                             if type(symbol_table[var_iden]) == int:
                                 symbol_table[dest] = str(symbol_table[var_iden])
                             elif type(symbol_table[var_iden]) == float:
                                 symbol_table[dest] = str(truncate(symbol_table[var_iden],2))
+                        #uninitialized variable
                         else:
                             symbol_table[dest] = ''
+                            
+        #Prints toBePrinted to GUI terminal
         if isPrinting == True:
             printToConsole(toBePrinted,terminal)
             toBePrinted = ""
-        code = code + "\n"
         isDeclaring = isPrinting = isInputting = isTypecasting = False
     
-    # execute()
     return symbol_table
