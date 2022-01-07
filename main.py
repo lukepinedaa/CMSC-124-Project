@@ -40,6 +40,10 @@ def displaySymbolTable(st):
         r = item[1]
         if item[1] == None:
             r = ""
+        elif type(item[1]) == bool and item[1] == True:
+            r = "WIN"
+        elif type(item[1]) == bool and item[1] == False:
+            r = "FAIL"
         symbol_table.insert(parent="",index="end",iid=count, text="", values=(str(item[0]),str(r))) # insert current element to table
         count = count+1
 
