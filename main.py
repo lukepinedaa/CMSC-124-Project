@@ -24,7 +24,7 @@ from itertools import chain
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-# For printing the  lexemes
+# For printing the lexemes
 def displayLexemes(flatTokenList):
     lexeme_table.delete(*lexeme_table.get_children()) # clear the current content of the table
     count = 0 # a unique identifier for each content of the table
@@ -32,17 +32,32 @@ def displayLexemes(flatTokenList):
         lexeme_table.insert(parent="", index="end", iid=count, text="", values=(token["lexeme"], token["type"])) # insert current element to table
         count = count+1 # update count
 
+# For printing the symbol table
+def displaySymbolTable(st):
+    symbol_table.delete(*symbol_table.get_children()) # clear the current content of the table
+    count = 0 # a unique identifier for each content of the table
+    for item in st.items():
+        r = item[1]
+        if item[1] == None:
+            r = ""
+        symbol_table.insert(parent="",index="end",iid=count, text="", values=(str(item[0]),str(r))) # insert current element to table
+        count = count+1
+
 # For printing error on the console
 def printError(err):
-    if err[0] == "lexical_err":
-        print("lexical error")
-    elif err[0] == "parser_err":
-        print("parser error")
+    s = "ERROR: "+str(err[1])+" at Line "+str(err[0])
+    terminal.config(state=NORMAL)
+    terminal.insert(END,s+"\n")
+    terminal.config(state=DISABLED)
 
 # execute Function
 def execute():
     code = text_editor.get("1.0","end-1c") # user's code
-
+    terminal.config(state=NORMAL)
+    terminal.delete('1.0', END) # clears the terminal
+    terminal.config(state=DISABLED)
+    symbol_table.delete(*symbol_table.get_children()) # clears the current content of the table
+    lexeme_table.delete(*lexeme_table.get_children()) # clears the current content of the table
     if code == "": # no code 
         return
 
@@ -55,17 +70,23 @@ def execute():
             parser_result = parser(lexer_result) # pass lexer result to parser
 
             if parser_result[0] != 0: # parser detected an error
-                printError(["parser_err",parser_result]) # print error message to console
+                printError(parser_result) # print error message to console
             else:
-                interpret(lexer_result,terminal) # invoke semantic analyzer
+                st = interpret(lexer_result,terminal,window) # invoke semantic analyzer
+                displaySymbolTable(st) # display the symbol table
+
+            # st = interpret(lexer_result,terminal,window) # invoke semantic analyzer
+            # displaySymbolTable(st) # display the symbol table
                 
 
         else: # lexer detected an error
             printError(["lexical_err",lexer_result]) # print error message to console
 
     except Exception as e:
-        # print("Something went wrong")
-        print("\n=====================\n",e)
+        e = "ERROR: "+str(e)
+        terminal.config(state=NORMAL)
+        terminal.insert(END,e+"\n")
+        terminal.config(state=DISABLED)
 
 # For saving the file (Save As)
 def save():
@@ -178,7 +199,7 @@ terminal_bg_2 = canvas.create_image(
 )
 terminal = Text(
     bd=0,
-    bg="#1E292F",
+    bg="#1b282e",
     highlightthickness=0,
     selectbackground="#009687",
     selectforeground="black",
@@ -317,6 +338,7 @@ canvas.create_text(
     fill="#009687",
     font=("Archivo Bold", 12 * -1)
 )
+
 ################################################
 
 ################################################
@@ -385,6 +407,13 @@ runBtn.place(
     height=37.0
 )
 ################################################
-
+canvas.create_text(
+    974,
+    510,
+    anchor="nw",
+    text="Symbol Table",
+    fill="white",
+    font=("Archivo Bold", 16 * -1)
+)
 # Loop
 window.mainloop()
