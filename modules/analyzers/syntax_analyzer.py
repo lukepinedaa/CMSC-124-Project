@@ -110,7 +110,7 @@ def parser(output):
             if newArr[0] == newArr1[lines]:
                 line_error = lines+1
                 break
-        print("Line:",line_error, "\n",error)
+        # print("Line:",line_error, "\n",error)
         return(line_error, error)
     if re.match(KTHXBYE, newArr[-1]):
         pass
@@ -120,7 +120,7 @@ def parser(output):
             if newArr[-1] == newArr1[lines]:
                 line_error = lines+1
                 break
-        print("Line:",line_error, "\n",error)
+        # print("Line:",line_error, "\n",error)
         return(line_error, error)
 
     while lineCheckCount < linecount-1 and lineCheckCount != 0:
@@ -132,8 +132,9 @@ def parser(output):
                 noerror = True
                 break
             elif regex == regexpatterns[-1]:
-                print(curr_line)
-                print("wala pa sa syntax")
+                pass
+                # print("wala pa sa syntax")
+				# pass
             else:
                 continue
 
@@ -148,7 +149,7 @@ def parser(output):
                 if newArr[lineCheckCount] == newArr1[lines]:
                     line_error = lines+1
                     break
-            print("Line:",line_error, "\n",error)
+            # print("Line:",line_error, "\n",error)
             return(line_error, error)
 
     return(line_error, error)
