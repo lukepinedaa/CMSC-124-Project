@@ -95,7 +95,9 @@ def parser(output):
 	OMGWTF = "^OMGWTF$"
 	OIC = "^OIC$"
 	NO_WAI = "^NO[^\S\r\n]WAI$"
-	regexpatterns = [VISIBLE1, VISIBLE2,VISIBLE3, GIMMEH1, IHASA1, IHASA2, IHASA3, IHASA4, assign1,assign2,assign3,assign4,assign5,assign6,assign7, math_expr, bool_expr1, bool_expr2, comp_expr1, bool_inf_expr1, typecast1, typecast2, O_RLY, WTF, OMG_literal, GTFO, OMGWTF, OIC, YA_RLY,NO_WAI]
+	LOOP1 = "^IM[^\S\r\n]IN[^\S\r\n]YR[^\S\r\n][a-zA-Z]\w*[^\S\r\n](UPPIN|NERFIN)[^\S\r\n]YR[^\S\r\n][a-zA-Z]\w*[^\S\r\n]((TIL|WILE)[^\S\r\n])?(BOTH[^\S\r\n]SAEM|DIFFRINT)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n]((BIGGR[^\S\r\n]OF|SMALLR[^\S\r\n]OF)[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n]AN[^\S\r\n])?([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))$"
+	LOOP2 = "^IM[^\S\r\n]OUTTA[^\S\r\n]YR[^\S\r\n][a-zA-Z]\w*$"
+	regexpatterns = [VISIBLE3, VISIBLE2,VISIBLE1, GIMMEH1, IHASA1, IHASA2, IHASA3, IHASA4, assign1,assign2,assign3,assign4,assign5,assign6,assign7, math_expr, bool_expr1, bool_expr2, comp_expr1, bool_inf_expr1, typecast1, typecast2, O_RLY, WTF, OMG_literal, GTFO, OMGWTF, OIC, YA_RLY,NO_WAI, LOOP1, LOOP2]
 	
 
 
@@ -124,8 +126,7 @@ def parser(output):
 		noerror = False
 		curr_line = newArr[lineCheckCount]
 		for regex in regexpatterns:
-
-			reg = regex 
+			reg = regex
 			if re.match(reg,curr_line):
 				noerror = True
 				break
@@ -148,4 +149,3 @@ def parser(output):
 					break
 			print("Line:",line_error, "\n",error)
 			return(line_error, error)
-		
