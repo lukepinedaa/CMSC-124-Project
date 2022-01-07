@@ -92,6 +92,7 @@ def interpret(lexer_result,terminal,root):
     symbol_table = {"IT": None}
 
     isDeclaring = isInputting = isPrinting = isTypecasting = False
+    ifStatement = elseStatement = doIf = False
     toBePrinted = ""
 
     line_counter = 0 # line counter
@@ -107,6 +108,19 @@ def interpret(lexer_result,terminal,root):
             # the comment itself has already been removed by the lexer
             if _type == "Comment Delimiter": 
                 continue
+            
+            #if current lexeme is NO WAI, update ifStatement and elseStatement values
+            elif _type == "Else Keyword":
+                ifStatement = False
+                elseStatement = True
+
+            #if ifStatement is True but doIf is False, ignore current line
+            elif (ifStatement == True) and (doIf == False):
+                break
+                
+            #if elseStatement is True but doIf is True, ignore current line
+            elif (elseStatement == True) and (doIf == True):
+                break
             
             #if HAI or KTHXBYE, continue loop
             elif _type == "Code Delimiter":
@@ -328,7 +342,18 @@ def interpret(lexer_result,terminal,root):
                         #uninitialized variable
                         else:
                             symbol_table[dest] = ''
-                            
+
+            #if current lexeme is O RLY? or OIC
+            elif _type == "Conditional Delimiter":
+                if token["lexeme"] == "OIC": #if OIC, revert doIf and elseStatement to False
+                    doIf = elseStatement = False
+
+            #if YA RLY, update ifStatement to True and change doIf to True if IT value can be cast to WIN
+            elif _type == "If Keyword":
+                ifStatement = True
+                if bool(symbol_table["IT"]):
+                    doIf = True
+
         #Prints toBePrinted to GUI terminal
         if isPrinting == True:
             printToConsole(toBePrinted,terminal)
