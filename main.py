@@ -63,27 +63,23 @@ def execute():
     lexeme_table.delete(*lexeme_table.get_children()) # clears the current content of the table
     if code == "": # no code 
         return
-
+    #[False, lineCounter+1, "variable does not exist: TLDR"]
     lexer_result = lexer(code) # result of lexer
-    try:
-        flatTokenList = list(chain.from_iterable(lexer_result)) # flattens the 2D list (reference: https://www.geeksforgeeks.org/python-ways-to-flatten-a-2d-list/)
-        displayLexemes(flatTokenList) # display the result on the table
-
+    try:        
         if lexer_result[0] != False: # no error from lexer
+            flatTokenList = list(chain.from_iterable(lexer_result)) # flattens the 2D list (reference: https://www.geeksforgeeks.org/python-ways-to-flatten-a-2d-list/)
+            displayLexemes(flatTokenList) # display the result on the table
+
             parser_result = parser(lexer_result) # pass lexer result to parser
 
             if parser_result[0] != 0: # parser detected an error
                 printError(parser_result) # print error message to console
             else:
                 st = interpret(lexer_result,terminal,window) # invoke semantic analyzer
-                displaySymbolTable(st) # display the symbol table
-
-            # st = interpret(lexer_result,terminal,window) # invoke semantic analyzer
-            # displaySymbolTable(st) # display the symbol table
-                
+                displaySymbolTable(st) # display the symbol table                
 
         else: # lexer detected an error
-            printError(["lexical_err",lexer_result]) # print error message to console
+            printError([lexer_result[1], lexer_result[2]]) # print error message to console
 
     except Exception as e:
         e = "ERROR: "+str(e)
