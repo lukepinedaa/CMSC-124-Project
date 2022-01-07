@@ -86,7 +86,7 @@ def parser(output):
     #typcast
     typecast1 = "^MAEK[^\S\r\n]([a-zA-Z]\w*|-?(\d*\.\d+)|-?\d+|\".*\"|(WIN|FAIL))[^\S\r\n](A[^\S\r\n])?(TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE)$"
     typecast2 = "^[a-zA-Z]\w*[^\S\r\n]IS[^\S\r\n]NOW[^\S\r\n]A[^\S\r\n](TROOF|NOOB|NUMBR|NUMBAR|YARN|TYPE)$"
-    HAI = "^HAI ([0-9]*)(\.([0-9]+))?$"
+    HAI = "^HAI([^\S\r\n][0-9]+(\.([0-9]+)?))?$"
     KTHXBYE = "^KTHXBYE$"
     O_RLY = "^O[^\S\r\n]RLY\?$"
     YA_RLY = "^YA[^\S\r\n]RLY$"
