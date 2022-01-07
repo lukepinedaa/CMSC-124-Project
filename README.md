@@ -37,5 +37,5 @@ This project uses **Python**  _(Python 3.9.7)_  To compare or check your version
 
 ### Syntax Analyzer
 
-`parser(output)` - Accepts the symbol table made using the Lexical Analyzer. For checking the grammar of the code using the tokens made by the Lexical Analyzer. This returns the line number of error, a short description of the error, and a symbol table which is a dictionary.
+`parser(output)` - Accepts the symbol table made using the Lexical Analyzer. For checking the grammar of the code using the tokens made by the Lexical Analyzer. This returns the line number of error and a short description of the error.
 *<insert  other  modules\>*
