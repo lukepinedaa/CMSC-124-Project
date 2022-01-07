@@ -10,8 +10,8 @@ This is the final project for CMSC 124. This is an interpreter for LOL code.
 To run a LOLCODE using the IDE:
 
 1. Open your terminal.
-2. Download the zip file and unzip it to extract the project folder.
-3. Go to the location of the project folder by entering`cd <location>` to your terminal.
+2. Download the zip file and unzip it to extract the copy of the local repository.
+3. Go to the location of the **source code** directory inside the project folder by entering`cd <source code path>` to your terminal.
 4. Enter `python3 main.py` or `python main.py`to your terminal if your default python version is *Python3.x*
 5. Type a new code or open an existing file in the IDE.
 6. Click the Run button.
