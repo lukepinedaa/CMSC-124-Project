@@ -61,12 +61,12 @@ def lexer(code):
                 #if current word is TLDR
                 elif words[i] == "TLDR":
                     #if no OBTW (not closed) before this TLDR, return error
-                    if obtw == False: return(False, lineCounter+1, "variable does not exist: TLDR")
+                    if obtw == False: return([False, lineCounter+1, "variable does not exist: TLDR"])
                     #if "TLDR" is at the end of the line, update obtw value
                     if i==len(words)-1: 
                         obtw = False
                     #if not, return error to main
-                    else: return(False, lineCounter+1, "multiple line comment may not appear on the same line as code")
+                    else: return([False, lineCounter+1, "multiple line comment may not appear on the same line as code"])
                 
                 #append token to currentLine, current word as lexeme and type is "Comment Delimiter"
                 currentLine.append({"lexeme": words[i], "type": "Comment Delimiter"})
