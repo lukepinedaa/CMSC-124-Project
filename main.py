@@ -63,7 +63,7 @@ def execute():
     lexeme_table.delete(*lexeme_table.get_children()) # clears the current content of the table
     if code == "": # no code 
         return
-    #[False, lineCounter+1, "variable does not exist: TLDR"]
+    
     lexer_result = lexer(code) # result of lexer
     try:        
         if lexer_result[0] != False: # no error from lexer
