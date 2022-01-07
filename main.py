@@ -11,7 +11,6 @@ from semantic_analyzer import interpret
 # Import statements for the GUI
 from pathlib import Path
 from tkinter import *
-from tkinter import messagebox
 from tkinter import ttk
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./gui_assets")
