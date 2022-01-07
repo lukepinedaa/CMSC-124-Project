@@ -305,21 +305,23 @@ def interpret(lexer_result,terminal,root):
             elif _type == "Separator":
                 continue
             
-            #
+            #current lexeme is a type literal
             elif _type == "Type Literal":
                 if isTypecasting:
+                    #assign proper dest value
                     if checkInLine(line, "R") or checkInLine(line, "IS NOW A"):
                         dest = var_iden
                     else:
                         dest = "IT"
-                    if token["lexeme"] == "TROOF": # boolean
+                    
+                    if token["lexeme"] == "TROOF":
                         if symbol_table[var_iden] == "" or symbol_table[var_iden] == 0:
                             symbol_table[dest] = False
                         else:
                             symbol_table[dest] = True
                     elif token["lexeme"] == "NOOB":
                          printToConsole("ERROR: Cannot typecast "+var_iden+" into NOOB at Line "+str(line_counter),terminal) # error
-                    elif token["lexeme"] == "NUMBR": # float
+                    elif token["lexeme"] == "NUMBR":
                         if symbol_table[var_iden] != None:
                             if (type(symbol_table[var_iden]) == str) and is_num(symbol_table[var_iden]):
                                 symbol_table[dest] = float(symbol_table[var_iden].replace('"', ""))
