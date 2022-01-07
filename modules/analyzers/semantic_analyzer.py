@@ -313,14 +313,16 @@ def interpret(lexer_result,terminal,root):
                         dest = var_iden
                     else:
                         dest = "IT"
-                    
+                    #typecast to corresponding boolean value
                     if token["lexeme"] == "TROOF":
                         if symbol_table[var_iden] == "" or symbol_table[var_iden] == 0:
                             symbol_table[dest] = False
                         else:
                             symbol_table[dest] = True
+                    #typecast to corresponding boolean value
                     elif token["lexeme"] == "NOOB":
                          printToConsole("ERROR: Cannot typecast "+var_iden+" into NOOB at Line "+str(line_counter),terminal) # error
+                    #typecast to corresponding float value
                     elif token["lexeme"] == "NUMBR":
                         if symbol_table[var_iden] != None:
                             if (type(symbol_table[var_iden]) == str) and is_num(symbol_table[var_iden]):
@@ -332,6 +334,7 @@ def interpret(lexer_result,terminal,root):
                                 symbol_table[dest] = float(symbol_table[var_iden])
                         else:
                             symbol_table[dest] = 0.00
+                    #typecast to corresponding int value
                     elif token["lexeme"] == "NUMBAR":
                         if symbol_table[var_iden] != None:
                             if (type(symbol_table[var_iden]) == str) and is_num(symbol_table[var_iden]):
